@@ -112,7 +112,7 @@ print("✅ Merge realizado correctamente")
 # 7. EXPORTAR RESULTADO
 # =========================================================
 
-nombre_output = "SECOP_ATENEA_TOTAL_Merge_NoEstructurado.xlsx"
+nombre_output = "SECOP_ESTRUCTURADOYNOESTRUCTURADO.xlsx"
 
 ruta_archivo_salida = os.path.join(
     ruta_output,
