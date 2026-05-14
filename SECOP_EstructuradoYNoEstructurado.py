@@ -109,7 +109,7 @@ df_merge = pd.merge(
 print("✅ Merge realizado correctamente")
 
 # =========================================================
-# 7. EXPORTAR RESULTADO
+# 7. EXPORTAR RESULTADO PRINCIPAL
 # =========================================================
 
 nombre_output = "SECOP_ESTRUCTURADOYNOESTRUCTURADO.xlsx"
@@ -119,7 +119,7 @@ ruta_archivo_salida = os.path.join(
     nombre_output
 )
 
-print("\n💾 Exportando archivo Excel...")
+print("\n💾 Exportando archivo Excel principal...")
 
 df_merge.to_excel(
     ruta_archivo_salida,
@@ -127,12 +127,70 @@ df_merge.to_excel(
 )
 
 # =========================================================
-# 8. MENSAJE FINAL
+# 8. CREAR BASE DE OBLIGACIONES ESPECÍFICAS
+# =========================================================
+
+columnas_obligaciones = [
+    "id_contrato",
+    "referencia_del_contrato (contratos_electronicos)",
+    "urlproceso (contratos_electronicos)",
+    "fecha_publicacion_proceso",
+    "obligaciones específicas consolidadas",
+]
+
+columnas_faltantes = [
+    columna
+    for columna in columnas_obligaciones
+    if columna not in df_merge.columns
+]
+
+if columnas_faltantes:
+    raise ValueError(
+        "No se encontraron las siguientes columnas necesarias para "
+        "generar SECOP_OBLIGACIONES ESPECIFICAS.xlsx:\n"
+        + "\n".join(f"- {columna}" for columna in columnas_faltantes)
+    )
+
+df_obligaciones = df_merge[columnas_obligaciones].copy()
+
+columna_obligaciones = "obligaciones específicas consolidadas"
+texto_excluir = "Las previstas en los estudios previos que soportan esta contratación."
+
+obligaciones_limpias = (
+    df_obligaciones[columna_obligaciones]
+    .fillna("")
+    .astype(str)
+    .str.strip()
+)
+
+df_obligaciones = df_obligaciones[
+    (obligaciones_limpias != "")
+    & (obligaciones_limpias != texto_excluir)
+]
+
+nombre_output_obligaciones = "SECOP_OBLIGACIONES ESPECIFICAS.xlsx"
+
+ruta_archivo_obligaciones = os.path.join(
+    ruta_output,
+    nombre_output_obligaciones
+)
+
+print("\n💾 Exportando base de obligaciones específicas...")
+
+df_obligaciones.to_excel(
+    ruta_archivo_obligaciones,
+    index=False
+)
+
+# =========================================================
+# 9. MENSAJE FINAL
 # =========================================================
 
 print("\n========================================")
 print("✅ PROCESO FINALIZADO")
 print("========================================")
-print(f"📁 Archivo guardado en:\n{ruta_archivo_salida}")
-print(f"\n📊 Filas resultado: {len(df_merge):,}")
+print(f"📁 Archivo principal guardado en:\n{ruta_archivo_salida}")
+print(f"📁 Archivo de obligaciones guardado en:\n{ruta_archivo_obligaciones}")
+print(f"\n📊 Filas resultado principal: {len(df_merge):,}")
+print(f"📊 Filas obligaciones específicas: {len(df_obligaciones):,}")
 print("========================================")
